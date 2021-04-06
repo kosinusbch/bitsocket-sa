@@ -19,16 +19,15 @@ const port = (process.env.zmq_port ? process.env.zmq_port : '28332')
 
 let node_listen = async function () {
     const sock = new zmq.Subscriber
- 
     sock.connect("tcp://"+host+":"+port)
     sock.subscribe("rawtx")
     sock.subscribe("rawblock")
     console.log('[INFO]', 'Connected to ZMQ at '+host+':'+port)
-   
+
     for await (const [topic, message] of sock) {
         if (topic.toString() === 'rawtx') {
             var doc = bitcoin.decode_tx(message.toString('hex'))
-            mempool.set(doc.tx.txid, doc);
+            mempool.set(doc.hash, doc);
         } else if (topic.toString() == 'rawblock') {
             var raw = message.toString('hex')
             var rblock = bitcoin.Block.fromHex(raw)
@@ -37,7 +36,6 @@ let node_listen = async function () {
                 txs.push(rblock.transactions[i].getId())
             }
             var block = {hash: rblock.getId(), size: rblock.byteLength(), version: rblock.version, timestamp: rblock.timestamp, bits: rblock.bits, nonce: rblock.nonce, transactions: txs}
-
         }
     }
 }
@@ -48,10 +46,10 @@ app.get('/stream', function(req, res) {
     res.sseSetup()
     res.sseSend({ type: "open", data: [] })
     connections.pool[fingerprint] = res
-    console.log('🥳 [SSE_JOIN]', fingerprint, '(now '+Object.keys(connections.pool).length+' users)')
+    //console.log('🥳 [SSE_JOIN]', fingerprint, '(now '+Object.keys(connections.pool).length+' users)')
     req.on("close", function() {
         delete connections.pool[res.$fingerprint]
-        console.log('🚪 [SSE_LEAVE]', res.$fingerprint, '(now '+Object.keys(connections.pool).length+' users)')
+        //console.log('🚪 [SSE_LEAVE]', res.$fingerprint, '(now '+Object.keys(connections.pool).length+' users)')
     })
 })
 
