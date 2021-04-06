@@ -43,7 +43,7 @@ let decode_tx = function (hex) {
         in: inputs,
         out: outputs
     }
-    return parsed
+    return tx
 }
 
 module.exports = {
