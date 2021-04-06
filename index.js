@@ -27,7 +27,7 @@ let node_listen = async function () {
     for await (const [topic, message] of sock) {
         if (topic.toString() === 'rawtx') {
             var doc = bitcoin.decode_tx(message.toString('hex'))
-            mempool.set(doc.hash, doc);
+            mempool.set(doc.tx.hash, doc);
         } else if (topic.toString() == 'rawblock') {
             var raw = message.toString('hex')
             var rblock = bitcoin.Block.fromHex(raw)
@@ -46,10 +46,10 @@ app.get('/stream', function(req, res) {
     res.sseSetup()
     res.sseSend({ type: "open", data: [] })
     connections.pool[fingerprint] = res
-    //console.log('🥳 [SSE_JOIN]', fingerprint, '(now '+Object.keys(connections.pool).length+' users)')
+    console.log('🥳 [SSE_JOIN]', fingerprint, '(now '+Object.keys(connections.pool).length+' users)')
     req.on("close", function() {
         delete connections.pool[res.$fingerprint]
-        //console.log('🚪 [SSE_LEAVE]', res.$fingerprint, '(now '+Object.keys(connections.pool).length+' users)')
+        console.log('🚪 [SSE_LEAVE]', res.$fingerprint, '(now '+Object.keys(connections.pool).length+' users)')
     })
 })
 

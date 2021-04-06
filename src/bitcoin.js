@@ -1,21 +1,6 @@
 require('dotenv').config()
 const bitcoin = require('bitcoinjs-lib')
 
-let decode_script = function (script) {
-    var scripts = []
-    var script = script.split(' ')
-    for (var i = 0; i < script.length; i++) {
-        if(script[i].substring(0,3) == "OP_") {
-        } else {
-            scripts["h" + i] = script[i]
-            try {
-                scripts["s" + i] = decodeURIComponent(script[i].replace(/\s+/g, '').replace(/[0-9a-f]{2}/g, '%$&'))
-            } catch {}
-        }
-    }
-    return scripts
-}
-
 let decode_tx = function (hex) {
     var inputs = []
     var outputs = []
@@ -60,17 +45,19 @@ let decode_tx = function (hex) {
         }
     }
     var tx = {
-        hash: rtx.getId(),
-        version: rtx.version,
+        tx: {
+            hash: rtx.getId(),
+            size: rtx.byteLength(),
+            locktime: rtx.locktime,
+            version: rtx.version,
+        },
         in: inputs,
         out: outputs,
-        version: rtx.version,
-        locktime: rtx.locktime
     }
     console.log(tx)
     return tx
 }
 
 module.exports = {
-    decode_tx, decode_script
+    decode_tx
 }
