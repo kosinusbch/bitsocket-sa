@@ -3,7 +3,8 @@ module.exports = function (req, res, next) {
         res.writeHead(200, {
             'Content-Type': 'text/event-stream',
             'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive'
+            'Connection': 'keep-alive',
+            'Access-Control-Allow-Origin': '*'
         })
     }
 

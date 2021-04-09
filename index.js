@@ -18,25 +18,30 @@ const host = (process.env.zmq_host ? process.env.zmq_host : '127.0.0.1')
 const port = (process.env.zmq_port ? process.env.zmq_port : '28332')
 
 let node_listen = async function () {
-    const sock = new zmq.Subscriber
-    sock.connect("tcp://"+host+":"+port)
-    sock.subscribe("rawtx")
-    sock.subscribe("rawblock")
-    console.log('[INFO]', 'Connected to ZMQ at '+host+':'+port)
-
-    for await (const [topic, message] of sock) {
-        if (topic.toString() === 'rawtx') {
-            var doc = bitcoin.decode_tx(message.toString('hex'))
-            mempool.set(doc.tx.hash, doc);
-        } else if (topic.toString() == 'rawblock') {
-            var raw = message.toString('hex')
-            var rblock = bitcoin.Block.fromHex(raw)
-            var txs = []
-            for(var i = 0; i < rblock.transactions.length; i++) {
-                txs.push(rblock.transactions[i].getId())
+    try {
+        const sock = new zmq.Subscriber
+        sock.connect("tcp://"+host+":"+port)
+        sock.subscribe("rawtx")
+        sock.subscribe("rawblock")
+        console.log('[INFO]', 'Connected to ZMQ at '+host+':'+port)
+    
+        for await (const [topic, message] of sock) {
+            if (topic.toString() === 'rawtx') {
+                var doc = bitcoin.decode_tx(message.toString('hex'))
+                mempool.set(doc.tx.hash, doc);
+            } else if (topic.toString() == 'rawblock') {
+                var raw = message.toString('hex')
+                var rblock = bitcoin.Block.fromHex(raw)
+                var txs = []
+                for(var i = 0; i < rblock.transactions.length; i++) {
+                    txs.push(rblock.transactions[i].getId())
+                }
+                var block = {hash: rblock.getId(), size: rblock.byteLength(), version: rblock.version, timestamp: rblock.timestamp, bits: rblock.bits, nonce: rblock.nonce, transactions: txs}
             }
-            var block = {hash: rblock.getId(), size: rblock.byteLength(), version: rblock.version, timestamp: rblock.timestamp, bits: rblock.bits, nonce: rblock.nonce, transactions: txs}
         }
+    } catch (err) {
+        console.error(err)
+        node_listen()
     }
 }
 
@@ -55,7 +60,10 @@ app.get('/stream', function(req, res) {
 
 // Listen for new additions to "mempool" cache, send to users
 mempool.on("set", function(key, value){
+    value.dbg.s = (Date.now() - value.dbg.r)
+    delete value.dbg.r
     Object.keys(connections.pool).forEach(async function(key) {
+        console.log(value)
         connections.pool[key].sseSend({ type: "mempool", data: value })
     })
 })
