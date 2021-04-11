@@ -16,8 +16,8 @@ const connections = {
 
 const parsed_cache = new NodeCache({deleteOnExpire: true, stdTTL: 60, checkperiod: 65})
 const raw_cache = new NodeCache({deleteOnExpire: true, stdTTL: 60, checkperiod: 65})
-const host = (process.env.zmq_host ? process.env.zmq_host : '127.0.0.1')
-const port = (process.env.zmq_port ? process.env.zmq_port : '28332')
+const host = (process.env.node_zmq_host ? process.env.node_zmq_host : '127.0.0.1')
+const port = (process.env.node_zmq_port ? process.env.node_zmq_port : '28332')
 
 let node_listen = async function () {
   try {
