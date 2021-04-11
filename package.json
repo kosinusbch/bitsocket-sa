@@ -1,24 +1,30 @@
 {
-  "name": "bitcoin-socket",
+  "dependencies": {
+    "bitcoind-rpc": "^0.8.1",
+    "bitcore-lib": "^8.25.7",
+    "bitcore-lib-cash": "^8.25.7",
+    "bitcore-lib-ltc": "^8.25.7",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "node-cache": "^5.1.2",
+    "uuid": "^8.3.2",
+    "zeromq": "^6.0.0-beta.6"
+  },
+  "name": "bitsocket-sa",
   "version": "0.0.1",
-  "description": "Bitcoin-socket allows you to listen to Bitcoin, Bitcoin Cash and many other cryptocurrencies.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "MIT",
-  "dependencies": {
-    "bitcoind-rpc": "^0.8.1",
-    "bitcoinjs-lib": "^5.2.0",
-    "bitcore-lib-cash": "^8.25.7",
-    "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "lodash": "^4.17.21",
-    "node-cache": "^5.1.2",
-    "traverse": "^0.6.6",
-    "uuid": "^8.3.2",
-    "zeromq": "^6.0.0-beta.6"
-  }
+  "description": "Bitsocket Standalone (SA) includes all the features from Bitsocket FH, with 95% less of the bullshit. Bitsocket SA does this by routing around mongodb and parsing transactions from ZeroMQ directly, as well as many other performance improvements.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kosinusbch/bitsocket-sa.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kosinusbch/bitsocket-sa/issues"
+  },
+  "homepage": "https://bitsocket-sa.bch.sx"
 }
