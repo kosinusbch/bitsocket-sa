@@ -11,7 +11,7 @@ Bitsocket is simple way to stream bitcoin transactions straight from your local 
 * Added `tx.size` (transaction size in bytes)
 * Added `tx.lock` (locktime) and `tx.ver` (version)
 * Added `in.seq` for sequenceNumber
-* Added `o` for op codes. Instead of “b0": { “op": 106 } } it will now say "o0": "OP_RETURN"
+* Added `in.o(X)` for op codes. Instead of “b0": { “op": 106 } } it will now say "o0": "OP_RETURN"
 
 
 ## Installation

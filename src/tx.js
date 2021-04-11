@@ -4,8 +4,7 @@ const tna = require('../src/tna_bch')
 
 
 let parse_tx = async function (rawtx) {
-    var rtx = new bitcore.Transaction(Buffer.from(rawtx, 'hex'))
-    var tx = await tna.fromGene(rtx)
+    var tx = await tna.fromGene(rawtx)
     return tx
 }
 

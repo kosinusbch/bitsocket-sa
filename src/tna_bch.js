@@ -1,8 +1,9 @@
 require('dotenv').config()
 const bch = require('bitcore-lib-cash')
 
-var fromGene = function(gene, options) {
+var fromGene = function(rawtx, options) {
   return new Promise(function(resolve, reject) {
+    var gene = new bch.Transaction(Buffer.from(rawtx, 'hex'))
     let t = gene.toObject()
     let inputs = [];
     let outputs = [];
@@ -101,7 +102,7 @@ var fromGene = function(gene, options) {
       })
     }
     resolve({
-      tx: { h: t.hash, lock: gene.nLockTime, ver: gene.version },
+      tx: { h: t.hash, size: Buffer.from(rawtx, 'hex').length, lock: gene.nLockTime, ver: gene.version },
       in: inputs,
       out: outputs
     });
