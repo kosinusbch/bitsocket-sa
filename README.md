@@ -12,7 +12,7 @@ Bitsocket is simple way to stream bitcoin transactions straight from your local 
 * Added `tx.lock` (locktime) and `tx.ver` (version)
 * Added `in.seq` for sequenceNumber
 * Added `in.o(X)` for op codes. Instead of “b0": { “op": 106 } } it will now say "o0": "OP_RETURN"
-
+* Removed mongodb; query language now only supports direct matches, $in, $gt and $lt
 
 ## Installation
 

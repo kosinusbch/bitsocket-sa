@@ -2,8 +2,7 @@ var tx = {"tx":{"h":"9109870b7229abd3c5e363afe14b1ef9084ba7abed6c64f7b2f35258f99
 var query = {
     "v": 4,
     "q": {
-        "find": {"tx.h":{"$in": ["9109870b7229abd3c5e363afe14b1ef9084ba7abed6c64f7b2f35258f996e744"]}, "tx.size": {"$lt": 500}},
-        "limit": 10
+        "find": {"tx.h":{"$in": ["9109870b7229abd3c5e363afe14b1ef9084ba7abed6c64f7b2f35258f996e744"]}, "tx.size": {"$lt": 500}}
     }
 }
 
@@ -60,11 +59,40 @@ let is_match = function (tx, query) {
     })
 }
 
-is_match(tx, query).then(res => {
+let is_valid = function (query) {
+    return new Promise(function(resolve, reject) {
+        Object.keys(query.q.find).forEach(async function(key) {
+            if(!query.q.find[key]['$in'] && !query.q.find[key]['$gt'] && !query.q.find[key]['$lt']) {
+                reject('This app only supports {"$in": ["", ""]} (search by array), {"$gt": number} (greater than) and {"$lt": number} (lower than)')
+            }
+            if (!query.q || !query.q.find) {
+                reject('q or q.find is missing from your query')
+            }
+        })
+        resolve(true)
+    })
+}
+
+var test = function () {
+    var start = Date.now()
+    is_valid(query).then(res => {
+        is_match(tx, query).then(res => {
+            console.log('Took', Date.now() - start, 'ms')
+        }).catch(err => {
+            console.error(err)
+        })
+    }).catch(err => {
+        console.error(err)
+    })
+}
+
+test()
+
+/* is_match(tx, query).then(res => {
     console.log(res)
 }).catch(err => {
     console.error(err)
-})
+}) */
 
 module.exports = {
     is_match: is_match
