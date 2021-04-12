@@ -8,11 +8,15 @@ Bitsocket is simple way to stream bitcoin transactions straight from your local 
 
 ## Changes from Bitsocket FH
 
-* Added `tx.size` (transaction size in bytes)
+* Added `in.o(X)` for op codes. Instead of `“b0": { “op": 106 } }` it will now say `"o0": "OP_RETURN"`
+* Added new query language that supports direct matches, $in, $gt and $lt
 * Added `tx.lock` (locktime) and `tx.ver` (version)
+* Added `tx.size` (transaction size in bytes)
 * Added `in.seq` for sequenceNumber
-* Added `in.o(X)` for op codes. Instead of “b0": { “op": 106 } } it will now say "o0": "OP_RETURN"
-* Removed mongodb; query language now only supports direct matches, $in, $gt and $lt
+---
+* Removed MongoDB (might need to update your queries)
+* Removed large-type (l-prefixed) fields
+
 
 ## Installation
 
