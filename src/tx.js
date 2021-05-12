@@ -8,7 +8,13 @@ let parse_tx = async function (rawtx) {
     return tx
 }
 
+let parse_block = async function (rawtx) {
+    var tx = await tna.fromGene(rawtx)
+    return tx
+}
+
 
 module.exports = {
-    parse_tx
+    parse_tx,
+    parse_block
 }

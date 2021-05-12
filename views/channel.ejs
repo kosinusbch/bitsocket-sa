@@ -1,0 +1,176 @@
+<html>
+<head>
+<title>Bitsocket Standalone</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" crossorigin="anonymous">
+<link rel="stylesheet" href="/bitsocket.css">
+<link rel="stylesheet" href="/ace.css">
+<link rel="stylesheet" href="/jasontree.css">
+<link rel="stylesheet" href="/ace-editor.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/ace.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/mode-json.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+<script src="/jsontree.js"></script>
+<script id="grid-template" type="text/x-handlebars-template">
+  <table>
+    <thead>
+      <tr>
+        {{#each keys}}
+          <td class='top {{this}}'><i class='fas fa-expand-arrows-alt'></i>{{this}}</td>
+        {{/each}}
+      </tr>
+    </thead>
+    <tbody id="clusterize_content_unconfirmed" class="clusterize-content">
+    </tbody>
+  </table>
+</script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <div class='container'>
+    <header>
+      <h1>Bitsocket Standalone <p>by <a target="_blank" href="https://fountainhead.cash">Fountainhead Cash</a></p></h1>
+      <!--<p><a target="_blank" href="https://github.com/revivebch/bitsocket-sa">GitHub</a>, <a target="_blank" href="https://t.me/fountainheadcash">Telegram</a>, <a target="_blank" href="/queries">Queries</a></p>-->
+    </header>
+    <div class='jumbotron align-center header'>
+      <div id='editor'><%=code%></div>
+      <div class='flex'>
+        <span class='label'>SSE Endpoint</span>
+        <input readonly class='flexible url'>
+        <button id='query'>OPEN SOCKET</button>
+      </div>
+    </div>
+  </div>
+  <div class='loading'>
+      <span class='led'>
+        <span>
+         <i class="fas fa-power-off spinner"></i>
+        </span>
+         <span class='msg'></span>
+      </span>
+    </div>
+  <main>
+    <div id='channel'>
+      <div class='content'>
+        <table>
+          <tbody id="channel-content-area">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</body>
+<script src="/buffer.min.js"></script>
+<script>
+const btoa_ext = buf => Buffer.Buffer.from(buf).toString('base64');
+
+var audio = {
+  u: new Audio('/u.mp3'),
+  c: new Audio('/c.mp3'),
+  muted: false
+}
+audio.u.loop = false;
+audio.c.loop = false;
+
+var endpoint = window.location.origin + '/stream/';
+var source   = document.getElementById("grid-template").innerHTML;
+var template = Handlebars.compile(source);
+var editor;
+document.addEventListener("DOMContentLoaded", function(e) {
+  editor = ace.edit("editor");
+  editor.session.setMode("ace/mode/json");
+  editor.setTheme("ace/theme/idle_fingers");
+  editor.setShowPrintMargin(false);
+  editor.setOptions({
+    maxLines: Infinity,
+    minLines: 3,
+    tabSize: 2,
+    useSoftTabs: true
+  })
+  editor.getSession().on('change', function() {
+    var query = editor.getValue();
+    history.pushState(null, null, window.location.origin + "/channel/" + btoa_ext(query));
+    updateUrl(query)
+  })
+  run()
+  document.querySelector("#query").addEventListener("click", function(e) {
+    run()
+  })
+  document.body.addEventListener("click", function(e) {
+    if (e.target.classList.contains("top")) {
+      if (e.target.classList.contains("expanded")) {
+        e.target.classList.remove("expanded");
+      } else {
+        e.target.classList.add("expanded");
+      }
+    }
+  })
+})
+let bitsocket = null;
+var run = function() {
+  var query = editor.getValue();
+  console.log("query = ", query)
+  if (query && query.length > 0) {
+    try {
+      // make sure it's JSON
+      var parsed = JSON.parse(query)
+      console.log(parsed)
+
+      if ((parsed && parsed.request) || (parsed && parsed.v) ) {
+        updateUrl(query)
+
+        if (bitsocket !== null) {
+            bitsocket.close()
+        }
+
+        bitsocket = new EventSource(endpoint + btoa_ext(query));
+        
+        bitsocket.onopen = function(e) { // start spinning
+          document.querySelector(".loading i.spinner").classList.add("fa-spin")
+          document.querySelector(".loading .msg").innerHTML = "listening..."
+        }
+        
+        bitsocket.onclose = function(e) { // stop spinning
+          document.querySelector(".loading i.spinner").classList.remove("fa-spin")
+          document.querySelector(".loading .msg").innerHTML = "stopped..."
+          console.log(e)
+        }
+
+        bitsocket.onmessage = function(e) {
+          let data = JSON.parse(e.data);
+          
+          if (data.type === 'block') {
+            audio.c.play().catch(function(e) { });
+          } else if (data.type === 'mempool') {
+            audio.u.play().catch(function(e) { });
+          }
+
+          if(data.type == "mempool" || data.type == "block") { // disallow non-bitcoin related stuff
+            let tbody = document.getElementById('channel-content-area');
+            let tr = tbody.insertRow(-1); // put at start
+            let node = document.createElement('tr');
+            node.innerHTML = render(data.data, data.type); // "type":"" isn't queryable
+            tr.parentNode.prepend(node);          
+          }
+        }
+      }
+    } catch (e) {
+      console.log("query invalid json", e)
+    }
+  }
+}
+var updateUrl = function(query) {
+  var base64 = btoa_ext(query)
+  var u = document.querySelector(".url");
+  u.value = endpoint + base64;
+  u.classList.add("updated");
+  setTimeout(function() {
+    u.classList.remove("updated");
+  }, 500)
+}
+
+var render = function(item, type) {
+  return "<td class='main-td'>"+JSONTree.create(item)+"</td><td class='date-td'><div>"+type+"</div>"+((new Date).toLocaleTimeString())+"</td>";
+}
+</script>
+</html>

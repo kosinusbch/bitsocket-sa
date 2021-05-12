@@ -4,9 +4,12 @@ const app = express()
 const sse = require('./src/sse')
 const txs = require('./src/tx')
 const zmq = require('zeromq')
+const mingo = require('mingo')
 const { v4: uuid } = require('uuid')
 const NodeCache = require('node-cache')
 app.use(sse)
+app.set('view engine', 'ejs')
+app.use(express.static('public'))
 
 const connections = {
   raw: { pool: [] },
@@ -15,6 +18,8 @@ const connections = {
 
 const obj_cache = new NodeCache({deleteOnExpire: true, stdTTL: 60, checkperiod: 65})
 const raw_cache = new NodeCache({deleteOnExpire: true, stdTTL: 60, checkperiod: 65})
+const rblock_cache = new NodeCache({deleteOnExpire: true, stdTTL: 60, checkperiod: 65})
+const oblock_cache = new NodeCache({deleteOnExpire: true, stdTTL: 60, checkperiod: 65})
 const host = (process.env.node_zmq_host ? process.env.node_zmq_host : '127.0.0.1')
 const port = (process.env.node_zmq_port ? process.env.node_zmq_port : '28332')
 
@@ -47,6 +52,29 @@ let node_listen = async function () {
   }
 }
 
+app.get(/^\/channel\/(.+)/, function(req, res) {
+  let encoded = req.params[0]
+  let decoded = Buffer.from(encoded, 'base64').toString()
+  res.render('channel', {
+    bitserve_url: '/stream/',
+    code: decoded
+  })
+});
+
+app.get('/channel', function (req, res) {
+  res.render('channel', {
+    bitserve_url: '/stream/',
+    code: JSON.stringify({
+      "v": 3,
+      "q": { "find": {} }
+    }, null, 2)
+  })
+});
+
+app.get('/', function(req, res) {
+  res.redirect('/channel')
+});
+
 app.get('/stream/raw', function(req, res) {
   const fingerprint = uuid()
   res.$fingerprint = fingerprint
@@ -73,9 +101,33 @@ app.get('/stream', function(req, res) {
   })
 })
 
+app.get(/^\/stream\/(.+)/, function(req, res) {
+  let encoded = req.params[0]
+  let decoded = Buffer.from(encoded, 'base64').toString()
+  const fingerprint = uuid()
+  res.$query = decoded
+  res.$fingerprint = fingerprint
+  res.sseSetup()
+  res.sseSend({ type: "open", data: {} })
+  connections.parsed.pool[fingerprint] = res
+  console.log('[QUERY]', '🥳 [SSE_JOIN]', fingerprint, '(now '+(Object.keys(connections.parsed.pool).length + Object.keys(connections.raw.pool).length)+' users)')
+  req.on("close", function() {
+      delete connections.parsed.pool[res.$fingerprint]
+      console.log('[QUERY]', '🚪 [SSE_LEAVE]', res.$fingerprint, '(now '+(Object.keys(connections.parsed.pool).length + Object.keys(connections.raw.pool).length)+' users)')
+  })
+})
+
 let send_to = async function (format, type, data) {
-  Object.keys(connections[""+format+""].pool).forEach(async function(key) {
-    connections[""+format+""].pool[key].sseSend({type: type, data: [data]})
+  Object.keys(connections[format].pool).forEach(async function(key) {
+    if(format == 'parsed' && connections[format].pool[key].$query) {
+      var xquery = JSON.parse(connections[format].pool[key].$query)
+      let mquery = new mingo.Query(xquery.q.find);
+      if(mquery.test(data)) {
+        connections[format].pool[key].sseSend({type: type, data: [data]})
+      }
+    } else {
+      connections[format].pool[key].sseSend({type: type, data: [data]})
+    }
   })
 }
 

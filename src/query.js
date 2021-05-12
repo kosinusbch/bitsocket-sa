@@ -1,3 +1,5 @@
+const mingo = require('mingo')
+
 var tx = {"tx":{"h":"9109870b7229abd3c5e363afe14b1ef9084ba7abed6c64f7b2f35258f996e744","size":219,"lock":0,"ver":2},"in":[{"i":0,"seq":0,"b0":"sk1vig65L+GYlMKoUEe25A3bQ3YloftIOhIX7vbPCTZonrjgPLU0UWXQaIcm8Qv0U/S5aEt+obtCU908eOTyhEE=","b1":"AiudiO3/SIMm4vOdyQjicVjuq9G38xs47L+S6LqrpvFi","str":"b24d6f8a0eb92fe19894c2a85047b6e40ddb437625a1fb483a1217eef6cf0936689eb8e03cb5345165d0688726f10bf453f4b9684b7ea1bb4253dd3c78e4f28441 022b9d88edff488326e2f39dc908e27158eeabd1b7f31b38ecbf92e8baaba6f162","e":{"h":"00e4e191c409fc6e8a0f839c4f1bc8d3935fd339821a8910178a53970a5f9e55","i":1,"a":"qrav95p3fmwmt42mh4xj68jxguz7hzwe3un2qqjzfy"}}],"out":[{"i":0,"b2":"GwoAMx3Ir8DGXT7CXFPo0Ob54Y0=","s2":"\u001b\n\u00003\u001dÈ¯ï¿½ï¿½]>ï¿½\\Sï¿½ï¿½ï¿½ï¿½ï¿½","str":"OP_DUP OP_HASH160 1b0a00331dc8afc0c65d3ec25c53e8d0e6f9e18d OP_EQUALVERIFY OP_CHECKSIG","o0":"OP_DUP","o1":"OP_HASH160","o3":"OP_EQUALVERIFY","o4":"OP_CHECKSIG","e":{"v":1475,"i":0,"a":"qqds5qpnrhy2lsxxt5lvyhznargwd70p353e2ag564"}},{"i":1,"b2":"+sLQMU7dtdVbvU0tHkZHBeuJ2Y8=","s2":"ï¿½ï¿½ï¿½1NÝµï¿½[ï¿½M-\u001eFG\u0005ï¿½Ù","str":"OP_DUP OP_HASH160 fac2d0314eddb5d55bbd4d2d1e464705eb89d98f OP_EQUALVERIFY OP_CHECKSIG","o0":"OP_DUP","o1":"OP_HASH160","o3":"OP_EQUALVERIFY","o4":"OP_CHECKSIG","e":{"v":2768059,"i":1,"a":"qrav95p3fmwmt42mh4xj68jxguz7hzwe3un2qqjzfy"}}]}
 var query = {
     "v": 4,
@@ -73,21 +75,12 @@ let is_valid = function (query) {
     })
 }
 
-var test = function () {
-    var start = Date.now()
-    is_valid(query).then(res => {
-        is_match(tx, query).then(res => {
-            console.log('Took', Date.now() - start, 'ms')
-        }).catch(err => {
-            console.error(err)
-        })
-    }).catch(err => {
-        console.error(err)
-    })
-}
+var start = Date.now()
+let mquery = new mingo.Query(query.q.find);
 
-test()
-
+// test if an object matches query
+console.log(mquery.test(tx))
+console.log(Date.now() - start)
 /* is_match(tx, query).then(res => {
     console.log(res)
 }).catch(err => {

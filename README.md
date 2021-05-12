@@ -1,10 +1,14 @@
 # Bitsocket Standalone
 
-Bitsocket Standalone (SA) includes all the features from Bitsocket FH, with 95% less of the bullshit. Bitsocket SA does this by routing around mongodb and parsing transactions from ZeroMQ directly, as well as many other performance improvements.
+Bitsocket Standalone (SA) includes most of the features from Bitsocket FH but none of the bloat. Bitsocket SA does this by routing around mongodb and parsing transactions from ZeroMQ directly, as well as many other performance improvements.
 
 ## What is Bitsocket?
 
-Bitsocket is simple way to stream bitcoin transactions straight from your local BCH node to the world using SSE (Server Sent Events). This is not only more secure, but also offers far greater scalability than you'd get using ZeroMQ directly.
+Bitsocket is simple way to stream bitcoin transactions straight from your local Bitcoin Cash node to the world using SSE (Server Sent Events). 
+
+This is not only more secure, but also offers far better performance and customizability than you'd get from ZeroMQ direcly.
+
+[Click here to learn more](https://bitsocket-sa.bch.sx)
 
 ## Changes from Bitsocket FH
 
@@ -14,9 +18,8 @@ Bitsocket is simple way to stream bitcoin transactions straight from your local 
 * Added `tx.size` (transaction size in bytes)
 * Added `in.seq` for sequenceNumber
 ---
-* Removed MongoDB (might need to update your queries)
 * Removed large-type (l-prefixed) fields
-
+* Removed MongoDB (might need to update your queries)
 
 ## Installation
 

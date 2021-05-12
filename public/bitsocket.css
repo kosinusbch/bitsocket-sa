@@ -1,0 +1,119 @@
+html, body {
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 1em;
+    background: var(--bg);
+    color: var(--color);
+    margin: 0;
+    padding: 0;
+}
+
+*, ::after, ::before {
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+}
+
+header {
+    background: #333333;
+    color: #FFFFFF;
+    text-align: center;
+}
+
+header h1 {
+    padding: 18px;
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+header h1 p {
+    display: inline;
+    font-size: 0.5em;
+    color: #d0d0d0;
+    font-weight: 100;
+}
+
+header h1 p a {
+    color: #d0d0d0;
+}
+
+header a {
+    text-decoration: none;
+    color: #fff
+}
+
+header p {
+    margin: 0;
+    padding: 0px 0px 15px 0px;
+}
+
+.flex {
+    display: flex;
+    padding: 8px 8px 6px 0px;
+    align-items: center;
+}
+
+.label {
+    padding: 10px;
+}
+
+.label {
+    color: #5c5454;
+    padding: 5px 10px;
+}
+
+.align-center {
+    text-align: center;
+}
+
+input.url {
+    background: #EEEEEE;
+    padding: 13px 15px;
+    border: none;
+    font-family: Menlo, monaco, Courier;
+    font-size: 0.8em;
+    transition: background 1000ms ease-in;
+    border-radius: 0;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.flexible {
+    flex-grow: 1;
+}
+
+button {
+    padding: 13.5px;
+    background: #333333;
+    color: #fff;
+    border: none;
+    border-left: 1px solid #000;
+    font-size: 0.8em;
+    cursor: pointer;
+}
+
+.loading {
+    padding: 15px;
+    text-align: center;
+    font-size: 0.9em;
+    color: rgba(0,0,0,0.7);
+}
+
+td {
+    word-wrap: break-word;
+    font-size: 0.85em;
+    padding: 4px;
+    color: rgba(0,0,0,0.7);
+}
+
+td {
+    -webkit-transition: width 1s;
+    transition: width 1s;
+}
+
+tr {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+tr:nth-child(odd) {
+    background-color: #EEEEEE !important;
+}
