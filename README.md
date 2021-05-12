@@ -13,7 +13,7 @@ This is not only more secure, but also offers far better performance and customi
 ## Changes from Bitsocket FH
 
 * Added `in.o(X)` for op codes. Instead of `“b0": { “op": 106 } }` it will now say `"o0": "OP_RETURN"`
-* Added new query language that supports direct matches, $in, $gt and $lt
+* Added Mingo validation to emulate MongoDB queries
 * Added `tx.lock` (locktime) and `tx.ver` (version)
 * Added `tx.size` (transaction size in bytes)
 * Added `in.seq` for sequenceNumber
