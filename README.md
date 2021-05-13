@@ -56,3 +56,7 @@ Start the process as a daemon
 ```
 pm2 start index.js --name="bitsocket"
 ```
+
+### Conclusion
+
+Your Bitsocket server will now be live at `http://127.0.0.1:4000`
