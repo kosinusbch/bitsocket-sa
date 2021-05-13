@@ -1,10 +1,12 @@
 html, body {
-    font-family: 'Ubuntu', sans-serif;
     font-size: 1em;
     background: var(--bg);
     color: var(--color);
     margin: 0;
     padding: 0;
+    font-family: 'Noto Sans TC', sans-serif;
+    margin: 0;
+    background: #f5f5f5;
 }
 
 *, ::after, ::before {

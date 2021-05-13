@@ -25,6 +25,34 @@ This is not only more secure, but also offers far better performance and customi
 
 ### Prerequisites
 
-### Configuring Bitcoin Cash Node
+If you haven't already, go through the steps in the following guides to install nodejs and BCHN
+
+* [Installing NodeJS, NPM and PM2](https://github.com/kosinusbch/bitcoin-cash-devs/blob/master/installing-nodejs-npm-and-pm2.md)
+
+* [Installing And Configuring BCHN For Devs](https://github.com/kosinusbch/bitcoin-cash-devs/blob/master/installing-and-configuring-bchn-for-devs.md)
 
 ### Setting up Bitsocket SA
+
+First you need to clone the repository
+
+```
+git clone https://github.com/kosinusbch/bitsocket-sa && cd bitsocket-sa
+```
+
+Install NPM dependencies
+
+```
+npm install
+```
+
+Start the process
+
+```
+node index.js
+```
+
+Start the process as a daemon
+
+```
+pm2 start index.js --name="bitsocket"
+```
